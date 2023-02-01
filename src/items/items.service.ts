@@ -23,11 +23,14 @@ export class ItemsService {
   }
 
   findAll() {
-    return this.itemRepository.find();
+    return this.itemRepository.find({ relations: ['category', 'user'] });
   }
 
   findOne(id: number) {
-    return this.itemRepository.findOneBy({ id });
+    return this.itemRepository.findOne({
+      where: { id },
+      relations: ['category', 'user'],
+    });
   }
 
   update(id: number, updateItemDto: UpdateItemDto) {
