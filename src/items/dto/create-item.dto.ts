@@ -1,3 +1,4 @@
+import { CreateCategoryDto } from 'src/categories/dto/create-category.dto';
 import { CreateUserDto } from '../../users/dto/create-user.dto';
 
 export class CreateItemDto {
@@ -5,4 +6,5 @@ export class CreateItemDto {
   createdAt: Date;
   description: string;
   user: CreateUserDto;
+  category: CreateCategoryDto;
 }

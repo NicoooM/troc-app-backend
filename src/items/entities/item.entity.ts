@@ -1,3 +1,4 @@
+import { CategoryEntity } from 'src/categories/entities/category.entity';
 import { UserEntity } from 'src/users/entities/user.entity';
 import { Column, Entity, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
 
@@ -20,4 +21,9 @@ export class ItemEntity {
 
   @ManyToOne(() => UserEntity, (user) => user.items, { nullable: false })
   user: UserEntity;
+
+  @ManyToOne(() => CategoryEntity, (category) => category.items, {
+    nullable: false,
+  })
+  category: CategoryEntity;
 }
