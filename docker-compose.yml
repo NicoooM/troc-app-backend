@@ -1,0 +1,19 @@
+version: '3.1'
+services:
+  adminer:
+    image: adminer
+    container_name: adminer
+    environment:
+      ADMINER_DESIGN: pepa-linha
+      ADMINER_DEFAULT_SERVER: database
+    ports:
+      - 8080:8080
+  database:
+    image: postgres
+    restart: always
+    ports:
+      - ${POSTGRESQL_ADDON_PORT}:5432
+    environment:
+      POSTGRES_USER: ${POSTGRESQL_ADDON_USER}
+      POSTGRES_PASSWORD: ${POSTGRESQL_ADDON_PASSWORD}
+      POSTGRES_DB: ${POSTGRESQL_ADDON_DB}
