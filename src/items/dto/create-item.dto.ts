@@ -5,6 +5,5 @@ export class CreateItemDto {
   title: string;
   createdAt: Date;
   description: string;
-  user: CreateUserDto;
   category: CreateCategoryDto;
 }
