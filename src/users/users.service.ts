@@ -12,24 +12,26 @@ export class UsersService {
     private userRepository: Repository<UserEntity>,
   ) {}
 
-  create(createUser: CreateUserDto) {
+  async create(createUser: CreateUserDto) {
     const createdAt = new Date();
-    return this.userRepository.save({ ...createUser, createdAt });
+    return await this.userRepository.save({ ...createUser, createdAt });
   }
 
-  findAll(): Promise<UserEntity[]> {
-    return this.userRepository.find();
+  async findAll(): Promise<UserEntity[]> {
+    return await this.userRepository.find();
   }
 
-  findOne(username: string): Promise<UserEntity | undefined> {
-    return this.userRepository.findOneBy({ username });
+  async findOne(email: string): Promise<UserEntity | undefined> {
+    const user: UserEntity = await this.userRepository.findOneBy({ email });
+    delete user.password;
+    return user;
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return this.userRepository.update(id, updateUserDto);
+  async update(id: number, updateUserDto: UpdateUserDto) {
+    return await this.userRepository.update(id, updateUserDto);
   }
 
-  remove(id: number) {
-    return this.userRepository.delete(id);
+  async remove(id: number) {
+    return await this.userRepository.delete(id);
   }
 }

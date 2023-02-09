@@ -10,14 +10,16 @@ import {
 import { ItemsService } from './items.service';
 import { CreateItemDto } from './dto/create-item.dto';
 import { UpdateItemDto } from './dto/update-item.dto';
+import { Request } from '@nestjs/common/decorators';
+import { UserEntity } from 'src/users/entities/user.entity';
 
 @Controller('items')
 export class ItemsController {
   constructor(private readonly itemsService: ItemsService) {}
 
   @Post()
-  create(@Body() createItemDto: CreateItemDto) {
-    return this.itemsService.create(createItemDto);
+  create(@Body() createItemDto: CreateItemDto, @Request() req) {
+    return this.itemsService.create(createItemDto, req.user);
   }
 
   @Get()
