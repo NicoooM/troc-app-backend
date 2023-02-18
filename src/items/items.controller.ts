@@ -11,7 +11,6 @@ import { ItemsService } from './items.service';
 import { CreateItemDto } from './dto/create-item.dto';
 import { UpdateItemDto } from './dto/update-item.dto';
 import { Request } from '@nestjs/common/decorators';
-import { UserEntity } from 'src/users/entities/user.entity';
 
 @Controller('items')
 export class ItemsController {

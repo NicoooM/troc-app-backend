@@ -11,4 +11,9 @@ export class CategoryEntity {
 
   @OneToMany(() => ItemEntity, (item) => item.category, { nullable: true })
   items: ItemEntity[];
+
+  @OneToMany(() => ItemEntity, (item) => item.againstCategory, {
+    nullable: true,
+  })
+  againstItems: ItemEntity[];
 }
