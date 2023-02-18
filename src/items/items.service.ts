@@ -25,13 +25,15 @@ export class ItemsService {
   }
 
   findAll() {
-    return this.itemRepository.find({ relations: ['category', 'user'] });
+    return this.itemRepository.find({
+      relations: ['category', 'user', 'againstCategory'],
+    });
   }
 
   findOne(id: number) {
     return this.itemRepository.findOne({
       where: { id },
-      relations: ['category', 'user'],
+      relations: ['category', 'user', 'againstCategory'],
     });
   }
 

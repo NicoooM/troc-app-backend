@@ -26,4 +26,9 @@ export class ItemEntity {
     nullable: false,
   })
   category: CategoryEntity;
+
+  @ManyToOne(() => CategoryEntity, (category) => category.againstItems, {
+    nullable: false,
+  })
+  againstCategory: CategoryEntity;
 }
