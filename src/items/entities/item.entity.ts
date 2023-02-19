@@ -31,4 +31,7 @@ export class ItemEntity {
     nullable: false,
   })
   againstCategory: CategoryEntity;
+
+  @Column({ unique: true })
+  slug: string;
 }

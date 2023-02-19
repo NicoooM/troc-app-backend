@@ -6,4 +6,5 @@ export class CreateItemDto {
   createdAt: Date;
   description: string;
   category: CreateCategoryDto;
+  slug: string;
 }
