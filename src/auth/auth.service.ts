@@ -17,9 +17,10 @@ export class AuthService {
   ) {}
 
   async register(createUserDto: CreateUserDto) {
+    const { email } = createUserDto;
     const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
 
-    const findUser = await this.usersService.findOne(createUserDto.email);
+    const findUser = await this.userRepository.findOneBy({ email });
     if (findUser) {
       throw new HttpException('User already exists', 400);
     }
@@ -31,7 +32,7 @@ export class AuthService {
     return user;
   }
 
-  async login(loginDto: LoginDto): Promise<any> {
+  async login(loginDto: LoginDto) {
     const { email } = loginDto;
     const user: UserEntity = await this.userRepository.findOneBy({ email });
     if (!user) {
