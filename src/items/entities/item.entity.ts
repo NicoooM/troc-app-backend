@@ -1,9 +1,10 @@
 import { CategoryEntity } from 'src/categories/entities/category.entity';
+import { TimestampEntity } from 'src/Generic/timestamp.entity';
 import { UserEntity } from 'src/users/entities/user.entity';
 import { Column, Entity, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
 
 @Entity('item')
-export class ItemEntity {
+export class ItemEntity extends TimestampEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -11,12 +12,11 @@ export class ItemEntity {
   title: string;
 
   @Column()
-  createdAt: Date;
-
-  @Column()
   description: string;
 
-  @Column()
+  @Column({
+    default: true,
+  })
   isAvailable: boolean;
 
   @ManyToOne(() => UserEntity, (user) => user.items, { nullable: false })

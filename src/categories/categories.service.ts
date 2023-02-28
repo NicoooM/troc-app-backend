@@ -29,6 +29,6 @@ export class CategoriesService {
   }
 
   remove(id: number) {
-    return this.categoryRepository.delete(id);
+    return this.categoryRepository.softDelete(id);
   }
 }

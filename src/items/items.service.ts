@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { CreateItemDto } from './dto/create-item.dto';
 import { UpdateItemDto } from './dto/update-item.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -21,7 +21,6 @@ export class ItemsService {
       month: 'numeric',
       day: 'numeric',
     });
-    const isAvailable = true;
     const slugString = `${createItemDto.title} ${formatDate}`;
     const slug = slugify(slugString, {
       lower: true,
@@ -29,17 +28,25 @@ export class ItemsService {
     });
     return this.itemRepository.save({
       ...createItemDto,
-      createdAt,
-      isAvailable,
       user,
       slug,
     });
   }
 
   findAll() {
-    return this.itemRepository.find({
-      relations: ['category', 'user', 'againstCategory'],
-    });
+    // return this.itemRepository.find({
+    //   relations: ['category', 'user', 'againstCategory'],
+    // });
+
+    const posts = this.itemRepository
+      .createQueryBuilder('item')
+      .leftJoinAndSelect('item.category', 'category')
+      .leftJoinAndSelect('item.user', 'user')
+      .leftJoinAndSelect('item.againstCategory', 'againstCategory')
+      .orderBy('item.createdAt', 'DESC')
+      .getMany();
+
+    return posts;
   }
 
   findOne(slug: string) {
@@ -49,7 +56,20 @@ export class ItemsService {
     });
   }
 
-  async update(id: number, updateItemDto: UpdateItemDto) {
+  async update(id: number, updateItemDto: UpdateItemDto, user: UserEntity) {
+    const item = await this.itemRepository.findOne({
+      where: { id },
+      relations: ['user'],
+    });
+
+    if (!item) {
+      throw new HttpException('Item not found', 400);
+    }
+
+    if (item.user.id !== user.id) {
+      throw new HttpException('You are not the owner', 400);
+    }
+
     if (updateItemDto.title) {
       const item = await this.itemRepository.findOneBy({ id });
       const formatDate = item.createdAt.toLocaleDateString('fr-FR', {
@@ -66,7 +86,20 @@ export class ItemsService {
     return this.itemRepository.update(id, updateItemDto);
   }
 
-  remove(id: number) {
-    return this.itemRepository.delete(id);
+  async remove(id: number, user: UserEntity) {
+    const item = await this.itemRepository.findOne({
+      where: { id },
+      relations: ['user'],
+    });
+
+    if (!item) {
+      throw new HttpException('Item not found', 400);
+    }
+
+    if (item.user.id !== user.id) {
+      throw new HttpException('You are not the owner', 400);
+    }
+
+    return this.itemRepository.softDelete(id);
   }
 }

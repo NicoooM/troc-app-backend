@@ -1,20 +1,20 @@
 import { ItemEntity } from 'src/items/entities/item.entity';
 import { Column, Entity, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import { Exclude } from 'class-transformer';
+import { TimestampEntity } from 'src/Generic/timestamp.entity';
 
 @Entity('user')
-export class UserEntity {
+export class UserEntity extends TimestampEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
   @Column({ unique: true })
   username: string;
 
-  @Column()
-  createdAt: Date;
-
-  @Column()
+  @Column({ unique: true })
   email: string;
 
+  @Exclude()
   @Column()
   password: string;
 

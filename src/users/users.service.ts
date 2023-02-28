@@ -4,6 +4,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from './entities/user.entity';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
+import { HttpException } from '@nestjs/common/exceptions';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
@@ -12,9 +14,14 @@ export class UsersService {
     private userRepository: Repository<UserEntity>,
   ) {}
 
-  async create(createUser: CreateUserDto) {
-    const createdAt = new Date();
-    return await this.userRepository.save({ ...createUser, createdAt });
+  async create(createUserDto: CreateUserDto) {
+    const { password } = createUserDto;
+    const hashedPassword = bcrypt.hashSync(password, 10);
+
+    return await this.userRepository.save({
+      ...createUserDto,
+      password: hashedPassword,
+    });
   }
 
   async findAll(): Promise<UserEntity[]> {
@@ -23,7 +30,10 @@ export class UsersService {
 
   async findOne(email: string): Promise<UserEntity | undefined> {
     const user: UserEntity = await this.userRepository.findOneBy({ email });
-    delete user.password;
+    if (!user) {
+      throw new HttpException('Cannot find user', 400);
+    }
+
     return user;
   }
 
@@ -32,6 +42,12 @@ export class UsersService {
   }
 
   async remove(id: number) {
-    return await this.userRepository.delete(id);
+    return await this.userRepository.softDelete(id);
+  }
+
+  async getMe(user: UserEntity): Promise<UserEntity | undefined> {
+    const email = user.email;
+    const findUser = await this.userRepository.findOneBy({ email });
+    return findUser;
   }
 }
