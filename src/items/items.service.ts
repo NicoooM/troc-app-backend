@@ -69,7 +69,6 @@ export class ItemsService {
     if (item.user.id !== user.id) {
       throw new HttpException('You are not the owner', 400);
     }
-
     if (updateItemDto.title) {
       const item = await this.itemRepository.findOneBy({ id });
       const formatDate = item.createdAt.toLocaleDateString('fr-FR', {
