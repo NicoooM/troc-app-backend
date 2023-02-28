@@ -10,15 +10,18 @@ import {
 import { ItemsService } from './items.service';
 import { CreateItemDto } from './dto/create-item.dto';
 import { UpdateItemDto } from './dto/update-item.dto';
-import { Request } from '@nestjs/common/decorators';
+import { UseGuards } from '@nestjs/common/decorators';
+import { JwtAuthGuard } from 'src/auth/guard/jwt-auth.guard';
+import { User } from 'src/decorator/user.decorator';
 
 @Controller('items')
 export class ItemsController {
   constructor(private readonly itemsService: ItemsService) {}
 
   @Post()
-  create(@Body() createItemDto: CreateItemDto, @Request() req) {
-    return this.itemsService.create(createItemDto, req.user);
+  @UseGuards(JwtAuthGuard)
+  create(@Body() createItemDto: CreateItemDto, @User() user) {
+    return this.itemsService.create(createItemDto, user);
   }
 
   @Get()
@@ -32,12 +35,18 @@ export class ItemsController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateItemDto: UpdateItemDto) {
-    return this.itemsService.update(+id, updateItemDto);
+  @UseGuards(JwtAuthGuard)
+  update(
+    @Param('id') id: string,
+    @Body() updateItemDto: UpdateItemDto,
+    @User() user,
+  ) {
+    return this.itemsService.update(+id, updateItemDto, user);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.itemsService.remove(+id);
+  @UseGuards(JwtAuthGuard)
+  remove(@Param('id') id: string, @User() user) {
+    return this.itemsService.remove(+id, user);
   }
 }
