@@ -33,20 +33,48 @@ export class ItemsService {
     });
   }
 
-  findAll() {
-    // return this.itemRepository.find({
-    //   relations: ['category', 'user', 'againstCategory'],
-    // });
+  findAll(queries: any) {
+    let { limit, page } = queries;
+    const { category, againstCategory, search, userId } = queries;
+
+    if (!limit) {
+      limit = 3;
+    }
+
+    if (!page) {
+      page = 1;
+    }
 
     const posts = this.itemRepository
       .createQueryBuilder('item')
       .leftJoinAndSelect('item.category', 'category')
       .leftJoinAndSelect('item.user', 'user')
       .leftJoinAndSelect('item.againstCategory', 'againstCategory')
-      .orderBy('item.createdAt', 'DESC')
-      .getMany();
+      .orderBy('item.createdAt', 'DESC');
 
-    return posts;
+    if (category) {
+      posts.andWhere('item.category.id = :category', { category });
+    }
+
+    if (againstCategory) {
+      posts.andWhere('item.category.id = :againstCategory', {
+        againstCategory,
+      });
+    }
+
+    if (search) {
+      posts.andWhere('LOWER(item.title) LIKE :search', {
+        search: `%${search.toLowerCase()}%`,
+      });
+    }
+
+    if (userId) {
+      posts.andWhere('item.user.id = :userId', { userId });
+    }
+
+    posts.take(limit).skip((page - 1) * limit);
+
+    return posts.getMany();
   }
 
   findOne(slug: string) {

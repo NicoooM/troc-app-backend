@@ -16,47 +16,6 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  // async register(createUserDto: CreateUserDto) {
-  //   const { email, username } = createUserDto;
-
-  //   const findUsername = await this.userRepository.findOneBy({ username });
-  //   if (findUsername) {
-  //     throw new HttpException('Username already exists', 400);
-  //   }
-
-  //   const findUser = await this.userRepository.findOneBy({ email });
-  //   if (findUser) {
-  //     throw new HttpException('Email already exists', 400);
-  //   }
-
-  //   const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
-  //   const user = await this.usersService.create({
-  //     ...createUserDto,
-  //     password: hashedPassword,
-  //   });
-  //   return user;
-  // }
-
-  // async login(loginDto: LoginDto) {
-  //   const { email } = loginDto;
-  //   const user: UserEntity = await this.userRepository.findOneBy({ email });
-  //   if (!user) {
-  //     throw new HttpException('User not found', 404);
-  //   }
-
-  //   const isPasswordMatching = await bcrypt.compare(
-  //     loginDto.password,
-  //     user.password,
-  //   );
-
-  //   if (!isPasswordMatching) {
-  //     throw new HttpException('Invalid credentials', 400);
-  //   }
-
-  //   const token = jwt.sign({ email: user.email }, process.env.JWT_SECRET);
-  //   return { token };
-  // }
-
   register(createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto);
   }

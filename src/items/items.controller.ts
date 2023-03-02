@@ -6,15 +6,17 @@ import {
   Patch,
   Param,
   Delete,
+  ClassSerializerInterceptor,
 } from '@nestjs/common';
 import { ItemsService } from './items.service';
 import { CreateItemDto } from './dto/create-item.dto';
 import { UpdateItemDto } from './dto/update-item.dto';
-import { UseGuards } from '@nestjs/common/decorators';
+import { Query, UseGuards, UseInterceptors } from '@nestjs/common/decorators';
 import { JwtAuthGuard } from 'src/auth/guard/jwt-auth.guard';
 import { User } from 'src/decorator/user.decorator';
 
 @Controller('items')
+@UseInterceptors(ClassSerializerInterceptor)
 export class ItemsController {
   constructor(private readonly itemsService: ItemsService) {}
 
@@ -25,8 +27,8 @@ export class ItemsController {
   }
 
   @Get()
-  findAll() {
-    return this.itemsService.findAll();
+  findAll(@Query() queries) {
+    return this.itemsService.findAll(queries);
   }
 
   @Get(':slug')
