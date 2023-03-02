@@ -33,7 +33,7 @@ export class ItemsService {
     });
   }
 
-  findAll(queries: any) {
+  async findAll(queries: any) {
     let { limit, page } = queries;
     const { category, againstCategory, search, userId } = queries;
 
@@ -72,9 +72,20 @@ export class ItemsService {
       posts.andWhere('item.user.id = :userId', { userId });
     }
 
+    const total = await posts.getCount();
+
     posts.take(limit).skip((page - 1) * limit);
 
-    return posts.getMany();
+    const hasMore = page * limit < total;
+    const items = await posts.getMany();
+
+    const result = {
+      items,
+      total,
+      hasMore,
+    };
+
+    return result;
   }
 
   findOne(slug: string) {
