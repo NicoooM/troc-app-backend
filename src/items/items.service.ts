@@ -48,7 +48,7 @@ export class ItemsService {
     const posts = this.itemRepository
       .createQueryBuilder('item')
       .leftJoinAndSelect('item.category', 'category')
-      .leftJoinAndSelect('item.user', 'user')
+      .leftJoin('item.user', 'user')
       .leftJoinAndSelect('item.againstCategory', 'againstCategory')
       .orderBy('item.createdAt', 'DESC');
 
