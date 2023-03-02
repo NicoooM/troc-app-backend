@@ -57,7 +57,7 @@ export class ItemsService {
     }
 
     if (againstCategory) {
-      posts.andWhere('item.category.id = :againstCategory', {
+      posts.andWhere('item.againstCategory.id = :againstCategory', {
         againstCategory,
       });
     }
