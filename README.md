@@ -26,10 +26,26 @@
 
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
+## DB diagram
+
+<a href="https://dbdiagram.io/d/637f8e81c9abfc611175083f" target="_blank">Link</a>
+
 ## Installation
 
 ```bash
+$ docker-compose up -d
 $ npm install
+```
+
+## Create a .env file like the .env.example
+
+```bash
+$ POSTGRESQL_ADDON_HOST="localhost"
+$ POSTGRESQL_ADDON_PORT=5432
+$ POSTGRESQL_ADDON_USER="root"
+$ POSTGRESQL_ADDON_PASSWORD="root"
+$ POSTGRESQL_ADDON_DB="mydb"
+$ JWT_SECRET=secret
 ```
 
 ## Running the app
