@@ -28,8 +28,15 @@ export class UsersService {
     return await this.userRepository.find();
   }
 
-  async findOne(email: string): Promise<UserEntity | undefined> {
-    const user: UserEntity = await this.userRepository.findOneBy({ email });
+  async findOne(emailOrUsername: string): Promise<UserEntity | undefined> {
+    const user: UserEntity = await this.userRepository
+      .createQueryBuilder('user')
+      .where(
+        'user.email = :emailOrUsername OR user.username = :emailOrUsername',
+        { emailOrUsername },
+      )
+      .getOne();
+
     if (!user) {
       throw new HttpException('Cannot find user', 400);
     }
@@ -37,8 +44,20 @@ export class UsersService {
     return user;
   }
 
-  async update(id: number, updateUserDto: UpdateUserDto) {
-    return await this.userRepository.update(id, updateUserDto);
+  async update(updateUserDto: UpdateUserDto, user: UserEntity) {
+    const { username, postalCode, city } = updateUserDto;
+    const findUser = await this.userRepository.findOneBy({ username });
+
+    if (findUser && findUser.id !== user.id) {
+      throw new HttpException('Username already exists', 400);
+    }
+
+    return await this.userRepository.save({
+      ...user,
+      username,
+      postalCode,
+      city,
+    });
   }
 
   async remove(id: number) {
