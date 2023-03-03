@@ -12,6 +12,7 @@ import { UseGuards, UseInterceptors } from '@nestjs/common/decorators';
 import { ClassSerializerInterceptor } from '@nestjs/common/serializer';
 import { JwtAuthGuard } from 'src/auth/guard/jwt-auth.guard';
 import { User } from 'src/decorator/user.decorator';
+import { UpdateUserDto } from './dto/update-user.dto';
 import { UsersService } from './users.service';
 
 @Controller('users')
@@ -35,10 +36,11 @@ export class UsersController {
     return this.usersService.findOne(email);
   }
 
-  // @Patch(':id')
-  // update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-  //   return this.usersService.update(+id, updateUserDto);
-  // }
+  @Patch()
+  @UseGuards(JwtAuthGuard)
+  update(@Body() updateUserDto: UpdateUserDto, @User() user) {
+    return this.usersService.update(updateUserDto, user);
+  }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
