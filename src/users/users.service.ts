@@ -15,6 +15,29 @@ export class UsersService {
   ) {}
 
   async create(createUserDto: CreateUserDto) {
+    const { username, email } = createUserDto;
+    const findUserUsername = await this.userRepository
+      .createQueryBuilder('user')
+      .where('user.username = :username', {
+        username,
+      })
+      .getOne();
+
+    const findUserEmail = await this.userRepository
+      .createQueryBuilder('user')
+      .where('user.email = :email', {
+        email,
+      })
+      .getOne();
+
+    if (findUserUsername) {
+      throw new HttpException('Username already exists', 400);
+    }
+
+    if (findUserEmail) {
+      throw new HttpException('Email already exists', 400);
+    }
+
     const { password } = createUserDto;
     const hashedPassword = bcrypt.hashSync(password, 10);
 
@@ -38,7 +61,7 @@ export class UsersService {
       .getOne();
 
     if (!user) {
-      throw new HttpException('Cannot find user', 400);
+      throw new HttpException('Incorrect password or email', 400);
     }
 
     return user;
