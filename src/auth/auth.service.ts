@@ -24,7 +24,7 @@ export class AuthService {
     const user = await this.usersService.findOne(loginDto.email);
 
     if (!user) {
-      throw new Error('User not found');
+      throw new HttpException('Incorrect password or email', 400);
     }
 
     const validPassword = await bcrypt.compare(
@@ -33,7 +33,7 @@ export class AuthService {
     );
 
     if (!validPassword) {
-      throw new Error('Invalid password');
+      throw new HttpException('Incorrect password or email', 400);
     }
 
     const payload = {
