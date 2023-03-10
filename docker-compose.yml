@@ -17,3 +17,9 @@ services:
       POSTGRES_USER: ${POSTGRESQL_ADDON_USER}
       POSTGRES_PASSWORD: ${POSTGRESQL_ADDON_PASSWORD}
       POSTGRES_DB: ${POSTGRESQL_ADDON_DB}
+  maildev:
+    image: maildev/maildev
+    container_name: maildev
+    ports:
+      - ${MAILDEV_WEB_PORT}:1080
+      - ${MAILDEV_SMTP_PORT}:1025
