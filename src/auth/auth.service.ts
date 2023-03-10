@@ -10,12 +10,14 @@ import { JwtService } from '@nestjs/jwt/dist';
 import { ResetPasswordTokenService } from '../reset-password-token/reset-password-token.service';
 import { CreateResetPasswordTokenDto } from 'src/reset-password-token/dto/create-reset-password-token.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
+import { MailService } from 'src/mail/mail.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private usersService: UsersService,
     private resetPasswordTokenService: ResetPasswordTokenService,
+    private mailService: MailService,
     private jwtService: JwtService,
   ) {}
 
@@ -58,7 +60,13 @@ export class AuthService {
       createResetPasswordTokenDto,
     );
 
-    return token;
+    this.mailService.create({
+      to: createResetPasswordTokenDto.email,
+      subject: 'Reset password',
+      html: `<a href=http://localhost:3000/reset-password/${token.token}>Rénitialiser mon mot de passe</a>`,
+    });
+
+    return `An email has been sent to ${createResetPasswordTokenDto.email}`;
   }
 
   async resetPassword(token: string, resetPasswordDto: ResetPasswordDto) {

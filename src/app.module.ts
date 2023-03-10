@@ -8,6 +8,7 @@ import { ItemsModule } from './items/items.module';
 import { CategoriesModule } from './categories/categories.module';
 import { AuthModule } from './auth/auth.module';
 import { ResetPasswordTokenModule } from './reset-password-token/reset-password-token.module';
+import { MailModule } from './mail/mail.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { ResetPasswordTokenModule } from './reset-password-token/reset-password-
     CategoriesModule,
     AuthModule,
     ResetPasswordTokenModule,
+    MailModule,
   ],
   controllers: [AppController],
   providers: [AppService],

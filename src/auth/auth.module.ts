@@ -10,6 +10,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './strategy/jwt.strategy';
 import { ResetPasswordTokenService } from 'src/reset-password-token/reset-password-token.service';
 import { ResetPasswordTokenEntity } from 'src/reset-password-token/entities/reset-password-token.entity';
+import { MailService } from 'src/mail/mail.service';
 
 @Module({
   imports: [
@@ -21,7 +22,7 @@ import { ResetPasswordTokenEntity } from 'src/reset-password-token/entities/rese
     }),
     TypeOrmModule.forFeature([UserEntity, ResetPasswordTokenEntity]),
   ],
-  providers: [AuthService, JwtStrategy, ResetPasswordTokenService],
+  providers: [AuthService, JwtStrategy, ResetPasswordTokenService, MailService],
   controllers: [AuthController],
 })
 export class AuthModule {}
