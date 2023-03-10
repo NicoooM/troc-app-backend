@@ -7,6 +7,7 @@ import { UsersModule } from './users/users.module';
 import { ItemsModule } from './items/items.module';
 import { CategoriesModule } from './categories/categories.module';
 import { AuthModule } from './auth/auth.module';
+import { ResetPasswordTokenModule } from './reset-password-token/reset-password-token.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { AuthModule } from './auth/auth.module';
     ItemsModule,
     CategoriesModule,
     AuthModule,
+    ResetPasswordTokenModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -59,11 +59,6 @@ export class UsersService {
         { emailOrUsername },
       )
       .getOne();
-
-    if (!user) {
-      throw new HttpException('Incorrect password or email', 400);
-    }
-
     return user;
   }
 
@@ -80,6 +75,14 @@ export class UsersService {
       username,
       postalCode,
       city,
+    });
+  }
+
+  async updatePassword(password: string, user: UserEntity) {
+    const hashedPassword = bcrypt.hashSync(password, 10);
+    return await this.userRepository.save({
+      ...user,
+      password: hashedPassword,
     });
   }
 
