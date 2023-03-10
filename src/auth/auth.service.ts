@@ -63,7 +63,7 @@ export class AuthService {
     this.mailService.create({
       to: createResetPasswordTokenDto.email,
       subject: 'Reset password',
-      html: `<a href=http://localhost:3000/reset-password/${token.token}>Rénitialiser mon mot de passe</a>`,
+      html: `<a href=${process.env.FRONTEND_URL}/compte/mot-de-passe-oublie/${token.token}>Rénitialiser mon mot de passe</a>`,
     });
 
     return `An email has been sent to ${createResetPasswordTokenDto.email}`;
