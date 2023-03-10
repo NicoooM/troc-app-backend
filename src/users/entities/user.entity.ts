@@ -1,4 +1,5 @@
 import { ItemEntity } from 'src/items/entities/item.entity';
+import { ResetPasswordTokenEntity } from 'src/reset-password-token/entities/reset-password-token.entity';
 import { Column, Entity, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
 import { Exclude } from 'class-transformer';
 import { TimestampEntity } from 'src/Generic/timestamp.entity';
