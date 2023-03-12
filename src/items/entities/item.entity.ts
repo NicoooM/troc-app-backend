@@ -1,7 +1,14 @@
 import { CategoryEntity } from 'src/categories/entities/category.entity';
 import { TimestampEntity } from 'src/Generic/timestamp.entity';
 import { UserEntity } from 'src/users/entities/user.entity';
-import { Column, Entity, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
+import {
+  Column,
+  Entity,
+  PrimaryGeneratedColumn,
+  ManyToOne,
+  OneToMany,
+} from 'typeorm';
+import { UploadFileEntity } from 'src/upload-file/entities/upload-file.entity';
 
 @Entity('item')
 export class ItemEntity extends TimestampEntity {
@@ -34,4 +41,9 @@ export class ItemEntity extends TimestampEntity {
 
   @Column({ unique: true })
   slug: string;
+
+  @OneToMany(() => UploadFileEntity, (uploadFile) => uploadFile.item, {
+    nullable: true,
+  })
+  images: UploadFileEntity[];
 }

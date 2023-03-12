@@ -9,6 +9,7 @@ import { CategoriesModule } from './categories/categories.module';
 import { AuthModule } from './auth/auth.module';
 import { ResetPasswordTokenModule } from './reset-password-token/reset-password-token.module';
 import { MailModule } from './mail/mail.module';
+import { UploadFileModule } from './upload-file/upload-file.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { MailModule } from './mail/mail.module';
     AuthModule,
     ResetPasswordTokenModule,
     MailModule,
+    UploadFileModule,
   ],
   controllers: [AppController],
   providers: [AppService],
