@@ -6,15 +6,18 @@ import { ItemEntity } from './entities/item.entity';
 import { Repository } from 'typeorm';
 import { UserEntity } from 'src/users/entities/user.entity';
 import slugify from 'slugify';
+import { UploadFileService } from 'src/upload-file/upload-file.service';
 
 @Injectable()
 export class ItemsService {
   constructor(
     @InjectRepository(ItemEntity)
     private itemRepository: Repository<ItemEntity>,
+    private readonly uploadFileService: UploadFileService,
   ) {}
 
-  create(createItemDto: CreateItemDto, user: UserEntity) {
+  async create(createItemDto: CreateItemDto, user: UserEntity, files) {
+    this.uploadFileService.checkFiles(files);
     const createdAt = new Date();
     const formatDate = createdAt.toLocaleDateString('fr-FR', {
       year: 'numeric',
@@ -26,11 +29,15 @@ export class ItemsService {
       lower: true,
       strict: true,
     });
-    return this.itemRepository.save({
+    const item = await this.itemRepository.save({
       ...createItemDto,
       user,
       slug,
     });
+    files.forEach(async (file) => {
+      await this.uploadFileService.create(file, user, item);
+    });
+    return item;
   }
 
   async findAll(queries: any) {
@@ -95,10 +102,15 @@ export class ItemsService {
     });
   }
 
-  async update(id: number, updateItemDto: UpdateItemDto, user: UserEntity) {
+  async update(
+    id: number,
+    updateItemDto: UpdateItemDto,
+    user: UserEntity,
+    files,
+  ) {
     const item = await this.itemRepository.findOne({
       where: { id },
-      relations: ['user'],
+      relations: ['user', 'images'],
     });
 
     if (!item) {
@@ -121,6 +133,16 @@ export class ItemsService {
         strict: true,
       });
     }
+
+    console.log(item);
+
+    // if (files) {
+    //   this.uploadFileService.checkFiles(files);
+    //   files.forEach(async (file) => {
+    //     await this.uploadFileService.create(file, user, item);
+    //   });
+    // }
+
     return this.itemRepository.update(id, updateItemDto);
   }
 
