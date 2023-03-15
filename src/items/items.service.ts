@@ -56,6 +56,7 @@ export class ItemsService {
       .createQueryBuilder('item')
       .leftJoinAndSelect('item.category', 'category')
       .leftJoin('item.user', 'user')
+      .leftJoinAndSelect('item.images', 'images')
       .leftJoinAndSelect('item.againstCategory', 'againstCategory')
       .orderBy('item.createdAt', 'DESC');
 
@@ -98,7 +99,7 @@ export class ItemsService {
   findOne(slug: string) {
     return this.itemRepository.findOne({
       where: { slug },
-      relations: ['category', 'user', 'againstCategory'],
+      relations: ['category', 'user', 'againstCategory', 'images'],
     });
   }
 
@@ -121,7 +122,6 @@ export class ItemsService {
       throw new HttpException('You are not the owner', 400);
     }
     if (updateItemDto.title) {
-      const item = await this.itemRepository.findOneBy({ id });
       const formatDate = item.createdAt.toLocaleDateString('fr-FR', {
         year: 'numeric',
         month: 'numeric',
@@ -134,14 +134,30 @@ export class ItemsService {
       });
     }
 
-    console.log(item);
+    const filesToDeleteLength = updateItemDto?.filesToDelete?.length ?? 0;
 
-    // if (files) {
-    //   this.uploadFileService.checkFiles(files);
-    //   files.forEach(async (file) => {
-    //     await this.uploadFileService.create(file, user, item);
-    //   });
-    // }
+    const filesAvailable = 6 - item.images.length + filesToDeleteLength;
+
+    if (files) {
+      files = this.uploadFileService.checkFiles(
+        files,
+        filesAvailable > 0 ? filesAvailable : 0,
+      );
+    }
+
+    if (updateItemDto.filesToDelete) {
+      updateItemDto.filesToDelete.forEach((fileId) => {
+        this.uploadFileService.remove(Number(fileId), user);
+      });
+    }
+
+    if (files) {
+      files.forEach(async (file) => {
+        await this.uploadFileService.create(file, user, item);
+      });
+    }
+
+    delete updateItemDto.filesToDelete;
 
     return this.itemRepository.update(id, updateItemDto);
   }

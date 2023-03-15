@@ -1,7 +1,13 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import {
+  HttpException,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { S3 } from 'aws-sdk';
 import { ItemEntity } from 'src/items/entities/item.entity';
+import { UserEntity } from 'src/users/entities/user.entity';
 import { Repository } from 'typeorm';
 import { CreateUploadFileDto } from './dto/create-upload-file.dto';
 import { UpdateUploadFileDto } from './dto/update-upload-file.dto';
@@ -24,14 +30,17 @@ export class UploadFileService {
     this.bucketName = process.env.APP_AWS_BUCKET_NAME;
   }
 
-  checkFiles(files: any[]) {
-    if (files.length > 6) {
-      files = files.slice(0, 6);
+  checkFiles(files: any[], totalFiles?: number) {
+    if (typeof totalFiles !== 'undefined' && files.length > totalFiles) {
+      throw new HttpException('You can upload only 6 files', 400);
+    } else if (files.length > 6) {
+      throw new HttpException('You can upload only 6 files', 400);
     }
 
     files.forEach((file) => {
       this.checkFile(file);
     });
+    return files;
   }
 
   checkFile(fileData) {
@@ -69,7 +78,22 @@ export class UploadFileService {
     return this.s3.upload(uploadParams).promise();
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} uploadFile`;
+  async remove(id: number, user: UserEntity) {
+    const file = await this.uploadFileRepository.findOneBy({ id });
+    if (!file) {
+      throw new HttpException(`File with ID ${id} not found`, 404);
+    }
+
+    const deleteParams = {
+      Bucket: this.bucketName,
+      Key: file.Key,
+    };
+
+    try {
+      await this.s3.deleteObject(deleteParams).promise();
+      await this.uploadFileRepository.delete(id);
+    } catch (error) {
+      throw new HttpException(`Failed to delete file with ID ${id}`, 500);
+    }
   }
 }
