@@ -45,5 +45,5 @@ export class ItemEntity extends TimestampEntity {
   @OneToMany(() => UploadFileEntity, (uploadFile) => uploadFile.item, {
     nullable: true,
   })
-  images: UploadFileEntity[];
+  files: UploadFileEntity[];
 }
