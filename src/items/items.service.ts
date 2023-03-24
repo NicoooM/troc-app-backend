@@ -56,7 +56,7 @@ export class ItemsService {
       .createQueryBuilder('item')
       .leftJoinAndSelect('item.category', 'category')
       .leftJoin('item.user', 'user')
-      .leftJoinAndSelect('item.images', 'images')
+      .leftJoinAndSelect('item.files', 'files')
       .leftJoinAndSelect('item.againstCategory', 'againstCategory')
       .orderBy('item.createdAt', 'DESC');
 
@@ -99,7 +99,7 @@ export class ItemsService {
   findOne(slug: string) {
     return this.itemRepository.findOne({
       where: { slug },
-      relations: ['category', 'user', 'againstCategory', 'images'],
+      relations: ['category', 'user', 'againstCategory', 'files'],
     });
   }
 
@@ -111,7 +111,7 @@ export class ItemsService {
   ) {
     const item = await this.itemRepository.findOne({
       where: { id },
-      relations: ['user', 'images'],
+      relations: ['user', 'files'],
     });
 
     if (!item) {
@@ -136,7 +136,7 @@ export class ItemsService {
 
     const filesToDeleteLength = updateItemDto?.filesToDelete?.length ?? 0;
 
-    const filesAvailable = 6 - item.images.length + filesToDeleteLength;
+    const filesAvailable = 6 - item.files.length + filesToDeleteLength;
 
     if (files) {
       files = this.uploadFileService.checkFiles(
@@ -146,9 +146,16 @@ export class ItemsService {
     }
 
     if (updateItemDto.filesToDelete) {
-      updateItemDto.filesToDelete.forEach((fileId) => {
-        this.uploadFileService.remove(Number(fileId), user);
-      });
+      if (Array.isArray(updateItemDto.filesToDelete)) {
+        updateItemDto.filesToDelete.forEach((fileId) => {
+          this.uploadFileService.remove(Number(fileId), user);
+        });
+      } else {
+        this.uploadFileService.remove(
+          Number(updateItemDto.filesToDelete),
+          user,
+        );
+      }
     }
 
     if (files) {

@@ -36,7 +36,7 @@ export class UploadFileEntity extends TimestampEntity {
   })
   Bucket: string;
 
-  @ManyToOne(() => ItemEntity, (item) => item.images, {
+  @ManyToOne(() => ItemEntity, (item) => item.files, {
     nullable: true,
   })
   item: ItemEntity;
