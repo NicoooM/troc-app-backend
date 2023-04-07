@@ -11,6 +11,9 @@ import { ResetPasswordTokenModule } from './reset-password-token/reset-password-
 import { MailModule } from './mail/mail.module';
 import { UploadFileModule } from './upload-file/upload-file.module';
 import { EventsModule } from './events/events.module';
+import { ConnectedUsersModule } from './connected-users/connected-users.module';
+import { MessagesModule } from './messages/messages.module';
+import { RoomsModule } from './rooms/rooms.module';
 
 @Module({
   imports: [
@@ -34,6 +37,9 @@ import { EventsModule } from './events/events.module';
     MailModule,
     UploadFileModule,
     EventsModule,
+    ConnectedUsersModule,
+    MessagesModule,
+    RoomsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

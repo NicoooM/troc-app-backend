@@ -12,8 +12,10 @@ import { Logger } from '@nestjs/common';
 import { from, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Server, Socket } from 'socket.io';
-import { AuthService } from 'src/auth/auth.service';
 import jwt_decode from 'jwt-decode';
+import { UsersService } from 'src/users/users.service';
+import { ConnectedUsersService } from 'src/connected-users/connected-users.service';
+import { RoomsService } from 'src/rooms/rooms.service';
 
 @WebSocketGateway({
   cors: {
@@ -23,31 +25,51 @@ import jwt_decode from 'jwt-decode';
 export class EventsGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
-  constructor(private authService: AuthService) {}
-  @WebSocketServer() io: Server;
-  server: Server;
+  constructor(
+    private usersService: UsersService,
+    private connectedUsersService: ConnectedUsersService,
+    private roomsService: RoomsService,
+  ) {}
+  @WebSocketServer() server: Server;
   private logger: Logger = new Logger('AppGateway');
 
-  handleConnection(client: Socket) {
+  async handleConnection(client: Socket) {
     const { token } = client.handshake.headers;
     if (!token) {
       return;
     }
     if (typeof token === 'string') {
       const decoded: any = jwt_decode(token);
-      const { id } = decoded;
-      console.log(decoded);
-      // this.authService.userOnline(id);
-      // client.join(id);
+      const { email } = decoded;
+      const user = await this.usersService.findOne(email);
+      client.data.user = user;
+      const rooms = await this.roomsService.findAll(user);
+      rooms.forEach((room) => {
+        this.handleJoinRoom(client, room.id.toString());
+      });
     }
   }
 
-  handleDisconnect(client: Socket) {
+  async handleDisconnect(client: Socket) {
+    const { user } = client.data;
+    if (!user) {
+      return;
+    }
+    await this.connectedUsersService.remove(client.id);
     console.log('Client disconnected');
   }
 
   afterInit(server: Server) {
     this.logger.log('Websocket server initialized');
+  }
+
+  handleJoinRoom(client: Socket, room: string) {
+    const { user } = client.data;
+    if (!user) {
+      return;
+    }
+    client.join(room);
+    this.server.to(room).emit('chat', 'joinRoom');
   }
 
   @SubscribeMessage('events')
@@ -64,6 +86,6 @@ export class EventsGateway
 
   @SubscribeMessage('chat')
   handleChatMessage(@MessageBody() message: string): void {
-    this.server.emit('chat', message);
+    this.server.to('1').emit('chat', message);
   }
 }
