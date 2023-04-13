@@ -1,5 +1,9 @@
+import { RoomEntity } from 'src/rooms/entities/room.entity';
+import { UserEntity } from 'src/users/entities/user.entity';
+
 export class CreateMessageDto {
   content: string;
-  senderId: number;
-  receiverId: number;
+  sender: UserEntity;
+  receiver: UserEntity;
+  room: RoomEntity;
 }

@@ -1,5 +1,6 @@
 import { CategoryEntity } from 'src/categories/entities/category.entity';
 import { TimestampEntity } from 'src/Generic/timestamp.entity';
+import { RoomEntity } from 'src/rooms/entities/room.entity';
 import { UserEntity } from 'src/users/entities/user.entity';
 import { Column, Entity, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
 
@@ -18,4 +19,9 @@ export class MessageEntity extends TimestampEntity {
     nullable: false,
   })
   receiver: UserEntity;
+
+  @ManyToOne(() => RoomEntity, {
+    nullable: false,
+  })
+  room: RoomEntity;
 }

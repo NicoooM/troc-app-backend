@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { RoomsService } from './rooms.service';
 import { CreateRoomDto } from './dto/create-room.dto';
@@ -32,8 +33,9 @@ export class RoomsController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.roomsService.findOne(+id);
+  @UseGuards(JwtAuthGuard)
+  findOne(@User() user: UserEntity, @Param('id') id: string) {
+    return this.roomsService.findOne(user, id);
   }
 
   // @Patch(':id')

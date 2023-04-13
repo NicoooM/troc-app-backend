@@ -1,16 +1,19 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { CreateRoomDto } from './dto/create-room.dto';
 import { UpdateRoomDto } from './dto/update-room.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { RoomEntity } from './entities/room.entity';
 import { Repository } from 'typeorm';
 import { UserEntity } from 'src/users/entities/user.entity';
+import { MessageEntity } from 'src/messages/entities/message.entity';
 
 @Injectable()
 export class RoomsService {
   constructor(
     @InjectRepository(RoomEntity)
     private roomRepository: Repository<RoomEntity>,
+    @InjectRepository(MessageEntity)
+    private messageRepository: Repository<MessageEntity>,
   ) {}
 
   async create(createRoomDto: CreateRoomDto, user: UserEntity) {
@@ -18,19 +21,58 @@ export class RoomsService {
     return await this.roomRepository.save(createRoomDto);
   }
 
-  findAll(user: UserEntity) {
+  async findAll(user: UserEntity) {
     const { id: userId } = user;
 
-    const rooms = this.roomRepository
+    const roomsQuery = this.roomRepository
       .createQueryBuilder('room')
       .where('room.firstUser = :userId', { userId })
       .orWhere('room.secondUser = :userId', { userId });
 
-    return rooms.getMany();
+    const rooms = await roomsQuery.getMany();
+
+    const formatRooms = rooms.map(async (room) => {
+      const latestMessageQuery = this.messageRepository
+        .createQueryBuilder('message')
+        .where('message.room = :roomId', { roomId: room.id })
+        .orderBy('message.createdAt', 'DESC')
+        .limit(1);
+
+      const latestMessage = await latestMessageQuery.getOne();
+      console.log(latestMessage);
+
+      return { ...room, latestMessage: latestMessage };
+    });
+
+    const formatRoomsResult = await Promise.all(formatRooms);
+
+    return formatRoomsResult;
   }
 
-  findOne(id: number) {
-    return this.roomRepository.findOneBy({ id });
+  async findOne(user: UserEntity, id: string) {
+    const { id: userId } = user;
+
+    const room = await this.roomRepository
+      .createQueryBuilder('room')
+      .where('room.id = :id', { id })
+      .leftJoinAndSelect('room.firstUser', 'firstUser')
+      .leftJoinAndSelect('room.secondUser', 'secondUser')
+      .getOne();
+
+    if (room.firstUser.id !== userId && room.secondUser.id !== userId) {
+      throw new HttpException('Unauthorized', 401);
+    }
+
+    const messages = await this.messageRepository
+      .createQueryBuilder('message')
+      .leftJoinAndSelect('message.room', 'room')
+      .where('room.id = :roomId', { roomId: id })
+      .orderBy('message.createdAt', 'ASC')
+      .getMany();
+
+    const roomData = { ...room, messages };
+
+    return roomData;
   }
 
   // update(id: number, updateRoomDto: UpdateRoomDto) {

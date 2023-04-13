@@ -11,5 +11,5 @@ export class RoomEntity extends TimestampEntity {
   firstUser: UserEntity;
 
   @ManyToOne(() => UserEntity, { nullable: false })
-  secondUser: number;
+  secondUser: UserEntity;
 }

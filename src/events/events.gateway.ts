@@ -16,6 +16,8 @@ import jwt_decode from 'jwt-decode';
 import { UsersService } from 'src/users/users.service';
 import { ConnectedUsersService } from 'src/connected-users/connected-users.service';
 import { RoomsService } from 'src/rooms/rooms.service';
+import { MessagesService } from 'src/messages/messages.service';
+import { CreateMessageDto } from 'src/messages/dto/create-message.dto';
 
 @WebSocketGateway({
   cors: {
@@ -29,6 +31,7 @@ export class EventsGateway
     private usersService: UsersService,
     private connectedUsersService: ConnectedUsersService,
     private roomsService: RoomsService,
+    private messagesService: MessagesService,
   ) {}
   @WebSocketServer() server: Server;
   private logger: Logger = new Logger('AppGateway');
@@ -69,7 +72,7 @@ export class EventsGateway
       return;
     }
     client.join(room);
-    this.server.to(room).emit('chat', 'joinRoom');
+    this.server.to(room).emit('chat', `${user.username} joined`);
   }
 
   @SubscribeMessage('events')
@@ -85,7 +88,16 @@ export class EventsGateway
   }
 
   @SubscribeMessage('chat')
-  handleChatMessage(@MessageBody() message: string): void {
-    this.server.to('1').emit('chat', message);
+  async handleChatMessage(client: Socket, payload: CreateMessageDto) {
+    const { user } = client.data;
+    payload.sender = user;
+    this.messagesService.create(payload);
+
+    const room = await this.roomsService.findOne(
+      user,
+      payload.room.id.toString(),
+    );
+
+    this.server.to(room.id.toString()).emit('chat', payload);
   }
 }
