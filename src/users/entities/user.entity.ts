@@ -17,7 +17,7 @@ export class UserEntity extends TimestampEntity {
   email: string;
 
   @Exclude()
-  @Column()
+  @Column({ select: false })
   password: string;
 
   @Column()

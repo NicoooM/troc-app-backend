@@ -26,6 +26,8 @@ export class RoomsService {
 
     const roomsQuery = this.roomRepository
       .createQueryBuilder('room')
+      .leftJoinAndSelect('room.firstUser', 'firstUser')
+      .leftJoinAndSelect('room.secondUser', 'secondUser')
       .where('room.firstUser = :userId', { userId })
       .orWhere('room.secondUser = :userId', { userId });
 

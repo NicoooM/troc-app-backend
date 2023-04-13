@@ -58,6 +58,7 @@ export class UsersService {
         'user.email = :emailOrUsername OR user.username = :emailOrUsername',
         { emailOrUsername },
       )
+      .addSelect('user.password')
       .getOne();
     return user;
   }
