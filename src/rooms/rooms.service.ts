@@ -34,6 +34,9 @@ export class RoomsService {
     const rooms = await roomsQuery.getMany();
 
     const formatRooms = rooms.map(async (room) => {
+      const otherUser =
+        room.firstUser.id === userId ? room.secondUser : room.firstUser;
+
       const latestMessageQuery = this.messageRepository
         .createQueryBuilder('message')
         .where('message.room = :roomId', { roomId: room.id })
@@ -41,9 +44,10 @@ export class RoomsService {
         .limit(1);
 
       const latestMessage = await latestMessageQuery.getOne();
-      console.log(latestMessage);
 
-      return { ...room, latestMessage: latestMessage };
+      delete room.firstUser;
+      delete room.secondUser;
+      return { ...room, latestMessage, otherUser };
     });
 
     const formatRoomsResult = await Promise.all(formatRooms);
@@ -51,7 +55,7 @@ export class RoomsService {
     return formatRoomsResult;
   }
 
-  async findOne(user: UserEntity, id: string) {
+  async findOne(user: UserEntity, id: number) {
     const { id: userId } = user;
 
     const room = await this.roomRepository
@@ -67,8 +71,8 @@ export class RoomsService {
 
     const messages = await this.messageRepository
       .createQueryBuilder('message')
-      .leftJoinAndSelect('message.room', 'room')
-      .where('room.id = :roomId', { roomId: id })
+      .leftJoinAndSelect('message.sender', 'sender')
+      .where('message.room.id = :roomId', { roomId: id })
       .orderBy('message.createdAt', 'ASC')
       .getMany();
 

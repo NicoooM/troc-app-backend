@@ -46,10 +46,11 @@ export class EventsGateway
       const { email } = decoded;
       const user = await this.usersService.findOne(email);
       client.data.user = user;
-      const rooms = await this.roomsService.findAll(user);
-      rooms.forEach((room) => {
-        this.handleJoinRoom(client, room.id.toString());
-      });
+      await this.connectedUsersService.create({ socketId: client.id, user });
+      // const rooms = await this.roomsService.findAll(user);
+      // rooms.forEach((room) => {
+      //   this.handleJoinRoom(client, room.id.toString());
+      // });
     }
   }
 
@@ -66,14 +67,14 @@ export class EventsGateway
     this.logger.log('Websocket server initialized');
   }
 
-  handleJoinRoom(client: Socket, room: string) {
-    const { user } = client.data;
-    if (!user) {
-      return;
-    }
-    client.join(room);
-    this.server.to(room).emit('chat', `${user.username} joined`);
-  }
+  // handleJoinRoom(client: Socket, room: string) {
+  //   const { user } = client.data;
+  //   if (!user) {
+  //     return;
+  //   }
+  //   client.join(room);
+  //   this.server.to(room).emit('chat', `${user.username} joined`);
+  // }
 
   @SubscribeMessage('events')
   findAll(@MessageBody() data: any): Observable<WsResponse<number>> {
@@ -91,13 +92,26 @@ export class EventsGateway
   async handleChatMessage(client: Socket, payload: CreateMessageDto) {
     const { user } = client.data;
     payload.sender = user;
+
+    const room = await this.roomsService.findOne(user, payload.room);
+
+    if (!room) {
+      throw new Error(`Could not find room with id ${payload.room}`);
+    }
+
+    const otherUserId =
+      room.firstUser.id === user.id ? room.secondUser.id : room.firstUser.id;
+
+    payload.receiver = otherUserId;
+
     this.messagesService.create(payload);
 
-    const room = await this.roomsService.findOne(
-      user,
-      payload.room.id.toString(),
+    const connectedUser = await this.connectedUsersService.findByUserId(
+      payload.receiver,
     );
 
-    this.server.to(room.id.toString()).emit('chat', payload);
+    if (connectedUser) {
+      this.server.to(connectedUser.socketId).emit('chat', payload);
+    }
   }
 }

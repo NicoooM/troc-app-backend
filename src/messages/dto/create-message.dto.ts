@@ -4,6 +4,6 @@ import { UserEntity } from 'src/users/entities/user.entity';
 export class CreateMessageDto {
   content: string;
   sender: UserEntity;
-  receiver: UserEntity;
-  room: RoomEntity;
+  receiver: number;
+  room: number;
 }

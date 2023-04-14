@@ -4,6 +4,7 @@ import { UpdateConnectedUserDto } from './dto/update-connected-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ConnectedUserEntity } from './entities/connected-user.entity';
 import { Repository } from 'typeorm';
+import { UserEntity } from 'src/users/entities/user.entity';
 
 @Injectable()
 export class ConnectedUsersService {
@@ -40,5 +41,13 @@ export class ConnectedUsersService {
       socketId,
     });
     return await this.connectedUserRepository.delete(connectedUser);
+  }
+
+  async findByUserId(userId: number) {
+    return await this.connectedUserRepository
+      .createQueryBuilder('connectedUser')
+      .leftJoinAndSelect('connectedUser.user', 'user')
+      .where('user.id = :userId', { userId })
+      .getOne();
   }
 }

@@ -18,10 +18,10 @@ export class MessageEntity extends TimestampEntity {
   @ManyToOne(() => UserEntity, (user) => user.receivedMessages, {
     nullable: false,
   })
-  receiver: UserEntity;
+  receiver: number;
 
   @ManyToOne(() => RoomEntity, {
     nullable: false,
   })
-  room: RoomEntity;
+  room: number;
 }
