@@ -3,7 +3,7 @@ import { CreateRoomDto } from './dto/create-room.dto';
 import { UpdateRoomDto } from './dto/update-room.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { RoomEntity } from './entities/room.entity';
-import { Repository } from 'typeorm';
+import { Brackets, Repository } from 'typeorm';
 import { UserEntity } from 'src/users/entities/user.entity';
 import { MessageEntity } from 'src/messages/entities/message.entity';
 
@@ -55,15 +55,32 @@ export class RoomsService {
     return formatRoomsResult;
   }
 
-  async findOne(user: UserEntity, id: number) {
+  async findOne(user: UserEntity, query: any) {
     const { id: userId } = user;
 
-    const room = await this.roomRepository
+    const { receiverId } = query;
+
+    let room = await this.roomRepository
       .createQueryBuilder('room')
-      .where('room.id = :id', { id })
       .leftJoinAndSelect('room.firstUser', 'firstUser')
       .leftJoinAndSelect('room.secondUser', 'secondUser')
+      .where('room.firstUser = :userId', { userId })
+      .andWhere('room.secondUser = :receiverId', { receiverId })
       .getOne();
+
+    if (!room) {
+      room = await this.roomRepository
+        .createQueryBuilder('room')
+        .leftJoinAndSelect('room.firstUser', 'firstUser')
+        .leftJoinAndSelect('room.secondUser', 'secondUser')
+        .where('room.firstUser = :receiverId', { receiverId })
+        .andWhere('room.secondUser = :userId', { userId })
+        .getOne();
+    }
+
+    if (!room) {
+      throw new Error('Room not found');
+    }
 
     if (room.firstUser.id !== userId && room.secondUser.id !== userId) {
       throw new HttpException('Unauthorized', 401);
@@ -72,7 +89,7 @@ export class RoomsService {
     const messages = await this.messageRepository
       .createQueryBuilder('message')
       .leftJoinAndSelect('message.sender', 'sender')
-      .where('message.room.id = :roomId', { roomId: id })
+      .where('message.room.id = :roomId', { roomId: room.id })
       .orderBy('message.createdAt', 'ASC')
       .getMany();
 

@@ -32,10 +32,10 @@ export class RoomsController {
     return this.roomsService.findAll(user);
   }
 
-  @Get(':id')
+  @Get('one')
   @UseGuards(JwtAuthGuard)
-  findOne(@User() user: UserEntity, @Param('id') id: string) {
-    return this.roomsService.findOne(user, Number(id));
+  findOne(@User() user: UserEntity, @Query() queries: any) {
+    return this.roomsService.findOne(user, queries);
   }
 
   // @Patch(':id')

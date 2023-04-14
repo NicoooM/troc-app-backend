@@ -63,6 +63,14 @@ export class UsersService {
     return user;
   }
 
+  async findOneById(id: number): Promise<UserEntity | undefined> {
+    const user: UserEntity = await this.userRepository
+      .createQueryBuilder('user')
+      .where('user.id = :id', { id })
+      .getOne();
+    return user;
+  }
+
   async update(updateUserDto: UpdateUserDto, user: UserEntity) {
     const { username, postalCode, city } = updateUserDto;
     const findUser = await this.userRepository.findOneBy({ username });

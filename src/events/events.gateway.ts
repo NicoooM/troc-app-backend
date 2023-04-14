@@ -93,16 +93,15 @@ export class EventsGateway
     const { user } = client.data;
     payload.sender = user;
 
-    const room = await this.roomsService.findOne(user, payload.room);
+    const room = await this.roomsService.findOne(user, {
+      receiverId: payload.receiver,
+    });
 
     if (!room) {
       throw new Error(`Could not find room with id ${payload.room}`);
     }
 
-    const otherUserId =
-      room.firstUser.id === user.id ? room.secondUser.id : room.firstUser.id;
-
-    payload.receiver = otherUserId;
+    payload.room = room.id;
 
     this.messagesService.create(payload);
 
