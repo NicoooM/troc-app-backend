@@ -86,6 +86,12 @@ export class RoomsService {
       throw new HttpException('Unauthorized', 401);
     }
 
+    const otherUser =
+      room.firstUser.id === userId ? room.secondUser : room.firstUser;
+
+    delete room.firstUser;
+    delete room.secondUser;
+
     const messages = await this.messageRepository
       .createQueryBuilder('message')
       .leftJoinAndSelect('message.sender', 'sender')
@@ -93,7 +99,7 @@ export class RoomsService {
       .orderBy('message.createdAt', 'ASC')
       .getMany();
 
-    const roomData = { ...room, messages };
+    const roomData = { ...room, messages, otherUser };
 
     return roomData;
   }
