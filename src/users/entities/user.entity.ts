@@ -3,6 +3,7 @@ import { ResetPasswordTokenEntity } from 'src/reset-password-token/entities/rese
 import { Column, Entity, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
 import { Exclude } from 'class-transformer';
 import { TimestampEntity } from 'src/Generic/timestamp.entity';
+import { MessageEntity } from 'src/messages/entities/message.entity';
 
 @Entity('user')
 export class UserEntity extends TimestampEntity {
@@ -16,7 +17,7 @@ export class UserEntity extends TimestampEntity {
   email: string;
 
   @Exclude()
-  @Column()
+  @Column({ select: false })
   password: string;
 
   @Column()
@@ -27,4 +28,14 @@ export class UserEntity extends TimestampEntity {
 
   @OneToMany(() => ItemEntity, (item) => item.user, { nullable: true })
   items: ItemEntity[];
+
+  @OneToMany(() => MessageEntity, (message) => message.sender, {
+    nullable: true,
+  })
+  sentMessages: MessageEntity[];
+
+  @OneToMany(() => MessageEntity, (message) => message.receiver, {
+    nullable: true,
+  })
+  receivedMessages: MessageEntity[];
 }

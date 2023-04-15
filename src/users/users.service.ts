@@ -58,6 +58,15 @@ export class UsersService {
         'user.email = :emailOrUsername OR user.username = :emailOrUsername',
         { emailOrUsername },
       )
+      .addSelect('user.password')
+      .getOne();
+    return user;
+  }
+
+  async findOneById(id: number): Promise<UserEntity | undefined> {
+    const user: UserEntity = await this.userRepository
+      .createQueryBuilder('user')
+      .where('user.id = :id', { id })
       .getOne();
     return user;
   }
