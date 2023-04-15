@@ -103,14 +103,15 @@ export class EventsGateway
 
     payload.room = room.id;
 
-    this.messagesService.create(payload);
+    const message = await this.messagesService.create(payload);
 
     const connectedUser = await this.connectedUsersService.findByUserId(
       payload.receiver,
     );
 
+    this.server.to(client.id).emit('chat', message);
     if (connectedUser) {
-      this.server.to(connectedUser.socketId).emit('chat', payload);
+      this.server.to(connectedUser.socketId).emit('chat', message);
     }
   }
 }
