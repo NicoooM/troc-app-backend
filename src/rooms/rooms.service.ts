@@ -52,6 +52,22 @@ export class RoomsService {
 
     const formatRoomsResult = await Promise.all(formatRooms);
 
+    formatRoomsResult.sort((roomA, roomB) => {
+      if (!roomA.latestMessage && !roomB.latestMessage) {
+        return 0;
+      }
+      if (!roomA.latestMessage) {
+        return 1;
+      }
+      if (!roomB.latestMessage) {
+        return -1;
+      }
+      return (
+        roomB.latestMessage.createdAt.getTime() -
+        roomA.latestMessage.createdAt.getTime()
+      );
+    });
+
     return formatRoomsResult;
   }
 
@@ -82,7 +98,11 @@ export class RoomsService {
       throw new Error('Room not found');
     }
 
-    if (room.firstUser.id !== userId && room.secondUser.id !== userId) {
+    if (
+      room.firstUser.id !== userId &&
+      room.secondUser instanceof UserEntity &&
+      room.secondUser.id !== userId
+    ) {
       throw new HttpException('Unauthorized', 401);
     }
 
