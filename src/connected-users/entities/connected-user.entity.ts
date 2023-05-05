@@ -2,8 +2,8 @@ import {
   Column,
   Entity,
   JoinColumn,
-  OneToOne,
   PrimaryGeneratedColumn,
+  ManyToOne,
 } from 'typeorm';
 import { UserEntity } from 'src/users/entities/user.entity';
 
@@ -12,12 +12,10 @@ export class ConnectedUserEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({
-    unique: true,
-  })
+  @Column()
   socketId: string;
 
-  @OneToOne(() => UserEntity)
+  @ManyToOne(() => UserEntity)
   @JoinColumn()
   user: UserEntity;
 }
