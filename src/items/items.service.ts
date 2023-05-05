@@ -42,7 +42,7 @@ export class ItemsService {
 
   async findAll(queries: any) {
     let { limit, page } = queries;
-    const { category, againstCategory, search, userId } = queries;
+    const { category, againstCategory, search, userId, exclude } = queries;
 
     if (!limit) {
       limit = 3;
@@ -78,6 +78,10 @@ export class ItemsService {
 
     if (userId) {
       posts.andWhere('item.user.id = :userId', { userId });
+    }
+
+    if (exclude) {
+      posts.andWhere('item.id != :exclude', { exclude });
     }
 
     const total = await posts.getCount();
