@@ -90,6 +90,6 @@
     "testEnvironment": "node"
   },
   "engines": {
-    "node": ">=18.13"
+    "node": "=18.13"
   }
 }
