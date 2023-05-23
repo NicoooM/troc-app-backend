@@ -11,6 +11,7 @@ import { JwtStrategy } from './strategy/jwt.strategy';
 import { ResetPasswordTokenService } from 'src/reset-password-token/reset-password-token.service';
 import { ResetPasswordTokenEntity } from 'src/reset-password-token/entities/reset-password-token.entity';
 import { MailService } from 'src/mail/mail.service';
+import { HttpModule } from '@nestjs/axios';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { MailService } from 'src/mail/mail.service';
       secret: process.env.JWT_SECRET,
     }),
     TypeOrmModule.forFeature([UserEntity, ResetPasswordTokenEntity]),
+    HttpModule,
   ],
   providers: [AuthService, JwtStrategy, ResetPasswordTokenService, MailService],
   controllers: [AuthController],

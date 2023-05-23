@@ -1,5 +1,10 @@
 export class CreateMailDto {
-  to: string;
-  subject: string;
-  html: string;
+  name: string;
+  subject?: string;
+  senderName: string;
+  senderEmail: string;
+  receiverName: string;
+  receiverEmail: string;
+  templateId: number;
+  params: object;
 }

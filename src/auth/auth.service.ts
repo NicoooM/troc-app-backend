@@ -3,9 +3,6 @@ import { UsersService } from '../users/users.service';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import * as bcrypt from 'bcrypt';
 import { LoginDto } from './dto/login.dto';
-import { UserEntity } from 'src/users/entities/user.entity';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt/dist';
 import { ResetPasswordTokenService } from '../reset-password-token/reset-password-token.service';
 import { CreateResetPasswordTokenDto } from 'src/reset-password-token/dto/create-reset-password-token.dto';
@@ -56,17 +53,31 @@ export class AuthService {
   async forgotPassword(
     createResetPasswordTokenDto: CreateResetPasswordTokenDto,
   ) {
-    const token = await this.resetPasswordTokenService.create(
-      createResetPasswordTokenDto,
-    );
+    try {
+      const { token } = await this.resetPasswordTokenService.create(
+        createResetPasswordTokenDto,
+      );
 
-    this.mailService.create({
-      to: createResetPasswordTokenDto.email,
-      subject: 'Reset password',
-      html: `<a href=${process.env.FRONTEND_URL}/compte/mot-de-passe-oublie/${token.token}>Rénitialiser mon mot de passe</a>`,
-    });
+      const frontUrl = process.env.FRONTEND_URL
+        ? process.env.FRONTEND_URL
+        : 'http://localhost:3000';
 
-    return `An email has been sent to ${createResetPasswordTokenDto.email}`;
+      await this.mailService.create({
+        name: 'Reset password',
+        senderName: 'Sender Name',
+        senderEmail: 'nmarsan33000@gmail.com',
+        receiverName: '',
+        receiverEmail: createResetPasswordTokenDto.email,
+        templateId: 7,
+        params: {
+          link: `${frontUrl}/compte/mot-de-passe-oublie/${token}`,
+        },
+      });
+
+      return `An email has been sent to ${createResetPasswordTokenDto.email}`;
+    } catch (error) {
+      throw new HttpException(error.message, error.status);
+    }
   }
 
   async resetPassword(token: string, resetPasswordDto: ResetPasswordDto) {
