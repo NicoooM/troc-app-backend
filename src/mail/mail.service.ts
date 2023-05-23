@@ -16,7 +16,7 @@ export class MailService {
       'content-type': 'application/json',
     };
 
-    const data = JSON.stringify({
+    const data = {
       to: [
         {
           email: createMailDto.receiverEmail,
@@ -33,7 +33,7 @@ export class MailService {
           'custom_header_1:custom_value_1|custom_header_2:custom_value_2|custom_header_3:custom_value_3',
         charset: 'iso-8859-1',
       },
-    });
+    };
 
     try {
       const res = await this.httpService.axiosRef.post(url, data, {
