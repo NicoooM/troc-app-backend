@@ -62,11 +62,11 @@ export class AuthService {
         ? process.env.FRONTEND_URL
         : 'http://localhost:3000';
 
-      const res = await this.mailService.create({
+      await this.mailService.create({
         name: 'Reset password',
         senderName: 'Sender Name',
         senderEmail: 'contact@trade-hub.fr',
-        receiverName: 'Test',
+        receiverName: createResetPasswordTokenDto.email,
         receiverEmail: createResetPasswordTokenDto.email,
         templateId: 7,
         params: {
