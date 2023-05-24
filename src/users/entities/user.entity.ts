@@ -20,10 +20,14 @@ export class UserEntity extends TimestampEntity {
   @Column({ select: false })
   password: string;
 
-  @Column()
+  @Column({
+    nullable: true
+  })
   city: string;
 
-  @Column()
+  @Column({
+    nullable: true
+  })
   postalCode: number;
 
   @OneToMany(() => ItemEntity, (item) => item.user, { nullable: true })
