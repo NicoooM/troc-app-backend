@@ -117,6 +117,21 @@ export class ItemsService {
     if (item.user.id !== user.id) {
       throw new HttpException('You are not the owner', 400);
     }
+
+    if (updateItemDto.filesToDelete) {
+      const existingFileIds = item.files.map((file) => file.id);
+      const invalidFileIds = updateItemDto.filesToDelete.filter(
+        (fileId) => !existingFileIds.includes(Number(fileId)),
+      );
+
+      if (invalidFileIds.length > 0) {
+        throw new HttpException(
+          `Invalid file IDs: ${invalidFileIds.join(', ')}`,
+          400,
+        );
+      }
+    }
+
     if (updateItemDto.title) {
       const formatDate = item.createdAt.toLocaleDateString('fr-FR', {
         year: 'numeric',
