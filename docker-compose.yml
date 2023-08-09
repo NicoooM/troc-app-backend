@@ -26,14 +26,6 @@ services:
       POSTGRES_USER: ${TEST_POSTGRESQL_ADDON_USER}
       POSTGRES_PASSWORD: ${TEST_POSTGRESQL_ADDON_PASSWORD}
       POSTGRES_DB: ${TEST_POSTGRESQL_ADDON_DB}
-  adminer_test:
-    image: adminer
-    container_name: adminer_test
-    environment:
-      ADMINER_DESIGN: pepa-linha
-      ADMINER_DEFAULT_SERVER: test_database
-    ports:
-      - 8081:8080
   maildev:
     image: maildev/maildev
     container_name: maildev

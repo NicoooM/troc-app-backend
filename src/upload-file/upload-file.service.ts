@@ -15,7 +15,7 @@ import { UploadFileEntity } from './entities/upload-file.entity';
 
 @Injectable()
 export class UploadFileService {
-  private s3;
+  private s3: S3;
   private bucketName;
 
   constructor(
@@ -30,7 +30,7 @@ export class UploadFileService {
     this.bucketName = process.env.APP_AWS_BUCKET_NAME;
   }
 
-  checkFiles(files: any[], totalFiles?: number) {
+  checkFiles(files: object[], totalFiles?: number) {
     if (typeof totalFiles !== 'undefined' && files.length > totalFiles) {
       throw new HttpException('You can upload only 6 files', 400);
     } else if (files.length > 6) {
@@ -58,12 +58,16 @@ export class UploadFileService {
   }
 
   async create(filesData, user, item: ItemEntity) {
-    const file = await this.uploadFileAws(user, filesData);
-    const uploadFile = await this.uploadFileRepository.create({
-      ...file,
-      item,
-    });
-    return await this.uploadFileRepository.save(uploadFile);
+    try {
+      const file = await this.uploadFileAws(user, filesData);
+      const uploadFile = await this.uploadFileRepository.create({
+        ...file,
+        item,
+      });
+      return await this.uploadFileRepository.save(uploadFile);
+    } catch (error) {
+      throw new InternalServerErrorException();
+    }
   }
 
   async uploadFileAws(user, fileData) {
@@ -78,7 +82,7 @@ export class UploadFileService {
     return this.s3.upload(uploadParams).promise();
   }
 
-  async remove(id: number, user: UserEntity) {
+  async remove(id: number) {
     const file = await this.uploadFileRepository.findOneBy({ id });
     if (!file) {
       throw new HttpException(`File with ID ${id} not found`, 404);

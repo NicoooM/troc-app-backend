@@ -46,7 +46,7 @@ export class AuthService {
     return { access_token: this.generateJwtToken(payload) };
   }
 
-  generateJwtToken(payload: any) {
+  generateJwtToken(payload: object) {
     return this.jwtService.sign(payload);
   }
 
@@ -63,8 +63,8 @@ export class AuthService {
         : 'http://localhost:3000';
 
       await this.mailService.create({
-        name: 'Reset password',
-        senderName: 'Sender Name',
+        name: 'Réinitialisation de mot de passe',
+        senderName: 'Nicolas de Trade Hub',
         senderEmail: 'contact@trade-hub.fr',
         receiverName: createResetPasswordTokenDto.email,
         receiverEmail: createResetPasswordTokenDto.email,

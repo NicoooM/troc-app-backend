@@ -1,12 +1,6 @@
 import { TimestampEntity } from 'src/Generic/timestamp.entity';
 import { ItemEntity } from 'src/items/entities/item.entity';
-import {
-  Column,
-  Entity,
-  PrimaryGeneratedColumn,
-  ManyToOne,
-  OneToOne,
-} from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
 
 @Entity('upload-file')
 export class UploadFileEntity extends TimestampEntity {

@@ -41,7 +41,6 @@ export class MailService {
       });
       return res;
     } catch (error) {
-      // Handle any errors
       throw new Error('Failed to send email.');
     }
   }

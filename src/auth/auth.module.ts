@@ -20,6 +20,7 @@ import { HttpModule } from '@nestjs/axios';
     PassportModule,
     JwtModule.register({
       secret: process.env.JWT_SECRET,
+      signOptions: { expiresIn: '7d' },
     }),
     TypeOrmModule.forFeature([UserEntity, ResetPasswordTokenEntity]),
     HttpModule,

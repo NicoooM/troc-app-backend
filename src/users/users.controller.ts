@@ -1,13 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-  Request,
-} from '@nestjs/common';
+import { Controller, Get, Body, Patch, Param, Delete } from '@nestjs/common';
 import { UseGuards, UseInterceptors } from '@nestjs/common/decorators';
 import { ClassSerializerInterceptor } from '@nestjs/common/serializer';
 import { JwtAuthGuard } from 'src/auth/guard/jwt-auth.guard';
@@ -31,9 +22,9 @@ export class UsersController {
     return this.usersService.getMe(user);
   }
 
-  @Get(':email')
-  findOne(@Param('email') email: string) {
-    return this.usersService.findOne(email);
+  @Get(':emailOrUsername')
+  findOne(@Param('emailOrUsername') emailOrUsername: string) {
+    return this.usersService.findOne(emailOrUsername);
   }
 
   @Patch()

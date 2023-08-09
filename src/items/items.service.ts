@@ -40,18 +40,14 @@ export class ItemsService {
     return item;
   }
 
-  async findAll(queries: any) {
+  async findAll(queries) {
     let { limit, page } = queries;
     const { category, againstCategory, search, userId, exclude, isAvailable } =
       queries;
 
-    if (!limit) {
-      limit = 3;
-    }
+    if (!limit) limit = 3;
 
-    if (!page) {
-      page = 1;
-    }
+    if (!page) page = 1;
 
     const posts = this.itemRepository
       .createQueryBuilder('item')
@@ -61,33 +57,24 @@ export class ItemsService {
       .leftJoinAndSelect('item.againstCategory', 'againstCategory')
       .orderBy('item.createdAt', 'DESC');
 
-    if (category) {
-      posts.andWhere('item.category.id = :category', { category });
-    }
+    if (category) posts.andWhere('item.category.id = :category', { category });
 
-    if (againstCategory) {
+    if (againstCategory)
       posts.andWhere('item.againstCategory.id = :againstCategory', {
         againstCategory,
       });
-    }
 
-    if (search) {
+    if (search)
       posts.andWhere('LOWER(item.title) LIKE :search', {
         search: `%${search.toLowerCase()}%`,
       });
-    }
 
-    if (userId) {
-      posts.andWhere('item.user.id = :userId', { userId });
-    }
+    if (userId) posts.andWhere('item.user.id = :userId', { userId });
 
-    if (exclude) {
-      posts.andWhere('item.id != :exclude', { exclude });
-    }
+    if (exclude) posts.andWhere('item.id != :exclude', { exclude });
 
-    if (isAvailable) {
+    if (isAvailable)
       posts.andWhere('item.isAvailable = :isAvailable', { isAvailable });
-    }
 
     const total = await posts.getCount();
 
@@ -157,13 +144,10 @@ export class ItemsService {
     if (updateItemDto.filesToDelete) {
       if (Array.isArray(updateItemDto.filesToDelete)) {
         updateItemDto.filesToDelete.forEach((fileId) => {
-          this.uploadFileService.remove(Number(fileId), user);
+          this.uploadFileService.remove(Number(fileId));
         });
       } else {
-        this.uploadFileService.remove(
-          Number(updateItemDto.filesToDelete),
-          user,
-        );
+        this.uploadFileService.remove(Number(updateItemDto.filesToDelete));
       }
     }
 
