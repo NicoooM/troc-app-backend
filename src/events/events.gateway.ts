@@ -47,10 +47,6 @@ export class EventsGateway
       const user = await this.usersService.findOne(email);
       client.data.user = user;
       await this.connectedUsersService.create({ socketId: client.id, user });
-      // const rooms = await this.roomsService.findAll(user);
-      // rooms.forEach((room) => {
-      //   this.handleJoinRoom(client, room.id.toString());
-      // });
     }
   }
 

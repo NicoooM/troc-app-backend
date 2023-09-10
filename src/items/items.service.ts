@@ -120,9 +120,18 @@ export class ItemsService {
 
     if (updateItemDto.filesToDelete) {
       const existingFileIds = item.files.map((file) => file.id);
-      const invalidFileIds = updateItemDto.filesToDelete.filter(
-        (fileId) => !existingFileIds.includes(Number(fileId)),
-      );
+      let invalidFileIds = [];
+
+      if (Array.isArray(updateItemDto.filesToDelete)) {
+        const invalid = updateItemDto.filesToDelete.filter(
+          (fileId) => !existingFileIds.includes(Number(fileId)),
+        );
+        invalidFileIds = [...invalid];
+      } else {
+        if (!existingFileIds.includes(Number(updateItemDto.filesToDelete))) {
+          invalidFileIds.push(updateItemDto.filesToDelete);
+        }
+      }
 
       if (invalidFileIds.length > 0) {
         throw new HttpException(
